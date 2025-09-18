@@ -7,13 +7,12 @@ import Layout from "../../components/common/Layout";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
 
-import Graphview from "../pages/GraphView/Graphview";
+import Graphview from "../pages/Graphview/Graphview";
 import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
 import PlanActual from "../pages/Planactual/Planactual";
 import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
 import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
-
-import MachinePlanTracker from "../pages/Machineplantracker/Machineplantracker";
+import MachinePlanTracker from "../pages/Machineplantracker/MachinePlanTracker";
 import LiveJobStatus from "../pages/LiveJobStatus/LiveJobStatus";
 import MachineStatusDashboard from "../pages/MachineStatusDashbord/MachineStatusDashboard";
 import MachineDashboard from "../pages/MachineDashboard/MachineDashboard";
