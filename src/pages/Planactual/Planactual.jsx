@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FiDownload, FiFilter, FiRefreshCw, FiBarChart2 } from 'react-icons/fi';
 
 const PlanActual = () => {
   // Sample data for Plan and Actual
@@ -15,145 +16,178 @@ const PlanActual = () => {
   ];
 
   const [month, setMonth] = useState('MAY');
-  const [year, setYear] = useState('2019');
+  const [year, setYear] = useState('2023');
+  const [activeTab, setActiveTab] = useState('plan');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  const years = ['2018', '2019', '2020', '2021', '2022'];
+  const years = ['2021', '2022', '2023', '2024'];
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    // Simulate API refresh
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
+  const renderTable = (data) => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th rowSpan="2" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line</th>
+            <th rowSpan="2" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total/MTD</th>
+            <th rowSpan="2" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg</th>
+            {Array.from({ length: 20 }, (_, i) => (
+              <th key={i} className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{i + 1}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {data.map((line, index) => (
+            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-50'}>              
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Line {line.line}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{line.total.toLocaleString()}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{line.avg.toLocaleString()}</td>
+              {line.daily.map((value, i) => (
+                <td key={i} className="px-3 py-4 whitespace-nowrap text-sm text-center text-gray-700">
+                  {value === 0 ? '-' : value}
+                </td>
+              ))}
+            </tr>
+          ))}
+          <tr className="bg-blue-50 font-semibold">
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">TOTAL</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+              {data.reduce((sum, line) => sum + line.total, 0).toLocaleString()}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+              {Math.round(data.reduce((sum, line) => sum + line.avg, 0) / data.length).toLocaleString()}
+            </td>
+            {Array.from({ length: 20 }).map((_, i) => {
+              const total = data.reduce((sum, line) => sum + (line.daily[i] || 0), 0);
+              return (
+                <td key={i} className="px-3 py-4 whitespace-nowrap text-sm text-center font-medium text-blue-600">
+                  {total === 0 ? '-' : total}
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold text-gray-800 mb-6">Plan vs Actual Report</h3>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+                  <FiBarChart2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">Plan vs Actual Report</h3>
+                  <p className="text-gray-500 text-sm">Track production performance against targets</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleRefresh}
+                  className={`p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
+                  disabled={isRefreshing}
+                >
+                  <FiRefreshCw className="w-5 h-5" />
+                </button>
+                <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                  <FiDownload className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
-            <select
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              {months.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-            <select
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              {years.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
-
-         <div className="flex items-end gap-2">
-  <button
-    onClick={() => console.log('Show clicked')}
-    className="bg-gradient-to-r from-indigo-400 to-indigo-400 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
-  >
-    Show
-  </button>
-  <button
-    onClick={() => console.log('Download clicked')}
-    className="bg-gradient-to-r from-indigo-400 to-indigo-400 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
-  >
-    Download
-  </button>
-</div>
-
-        </div>
-
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-700">Plan</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line</th>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total/MTD</th>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg</th>
-                  {Array.from({ length: 26 }, (_, i) => (
-                    <th key={i} colSpan={1} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{i + 1}</th>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                <select
+                  value={month}
+                  onChange={(e) => setMonth(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {months.map((m) => (
+                    <option key={m} value={m}>{m}</option>
                   ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {planData.map((line, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{line.line}</td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{line.total}</td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{line.avg}</td>
-                    {line.daily.map((value, i) => (
-                      <td key={i} className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{value}</td>
-                    ))}
-                  </tr>
-                ))}
-                <tr className="bg-yellow-50 font-semibold">
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">TOTAL</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {planData.reduce((sum, line) => sum + line.total, 0)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                  {Array.from({ length: 26 }, (_, i) => (
-                    <td key={i} className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                      {planData.reduce((sum, line) => sum + (line.daily[i] || 0), 0)}
-                    </td>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                <select
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {years.map((y) => (
+                    <option key={y} value={y}>{y}</option>
                   ))}
-                </tr>
-              </tbody>
-            </table>
+                </select>
+              </div>
+
+              <div className="flex items-end">
+                <button
+                  onClick={() => console.log('Apply filters')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
+                >
+                  <FiFilter className="w-4 h-4" />
+                  <span>Apply Filters</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-700">Actual</h2>
+        {/* Tabs */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px">
+              <button
+                onClick={() => setActiveTab('plan')}
+                className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+                  activeTab === 'plan'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Plan
+              </button>
+              <button
+                onClick={() => setActiveTab('actual')}
+                className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+                  activeTab === 'actual'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Actual
+              </button>
+            </nav>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line</th>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total/MTD</th>
-                  <th rowSpan="2" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg</th>
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <th key={i} colSpan={1} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{i + 1}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {actualData.map((line, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{line.line}</td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{line.total}</td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{line.avg}</td>
-                    {line.daily.map((value, i) => (
-                      <td key={i} className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{value}</td>
-                    ))}
-                  </tr>
-                ))}
-                <tr className="bg-yellow-50 font-semibold">
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">TOTAL</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {actualData.reduce((sum, line) => sum + line.total, 0)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900"></td>
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <td key={i} className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                      {actualData.reduce((sum, line) => sum + (line.daily[i] || 0), 0)}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
+
+          <div className="p-6">
+            {activeTab === 'plan' ? (
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-800">Production Plan - {month} {year}</h2>
+                {renderTable(planData)}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-800">Actual Production - {month} {year}</h2>
+                {renderTable(actualData)}
+              </div>
+            )}
           </div>
         </div>
       </div>
