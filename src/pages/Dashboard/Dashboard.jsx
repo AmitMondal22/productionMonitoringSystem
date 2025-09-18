@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import 'react-circular-progressbar/dist/styles.css';
 import {
   Activity,
@@ -54,6 +55,22 @@ const Dashboard = () => {
     return () => window.removeEventListener('resize', updateScreenSize);
   }, []);
 
+  // Production data for the chart
+  const productionData = [
+    { time: '00:00', production: 0, target: 50 },
+    { time: '02:00', production: 45, target: 100 },
+    { time: '04:00', production: 90, target: 150 },
+    { time: '06:00', production: 140, target: 200 },
+    { time: '08:00', production: 195, target: 250 },
+    { time: '10:00', production: 250, target: 300 },
+    { time: '12:00', production: 290, target: 350 },
+    { time: '14:00', production: 340, target: 400 },
+    { time: '16:00', production: 390, target: 450 },
+    { time: '18:00', production: 420, target: 500 },
+    { time: '20:00', production: 460, target: 550 },
+    { time: '22:00', production: 500, target: 600 },
+  ];
+
   const metricsData = {
     monthlyPlan: '3.4M',
     tillDateProduction: '395K',
@@ -62,7 +79,9 @@ const Dashboard = () => {
     rejection: '28',
     lossTime: '0.00 Min',
     efficiency: '87.5%',
-    targetAchievement: '92%'
+    targetAchievement: '92%',
+    currentHourProduction: productionData[new Date().getHours() / 2]?.production || 0,
+    currentHourTarget: productionData[Math.floor(new Date().getHours() / 2)]?.target || 0
   };
 
   const gaugeData = [
@@ -114,6 +133,7 @@ const Dashboard = () => {
           metricsData={metricsData} 
           gaugeData={gaugeData} 
           screenSize={screenSize} 
+          productionData={productionData} 
         />
       </div>
     </div>
@@ -124,7 +144,7 @@ const Dashboard = () => {
 
 
 // Main Grid Layout
-const ResponsiveMainGrid = ({ metricsData, gaugeData, screenSize }) => {
+const ResponsiveMainGrid = ({ metricsData, gaugeData, screenSize, productionData }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
@@ -143,8 +163,75 @@ const ResponsiveMainGrid = ({ metricsData, gaugeData, screenSize }) => {
               </button>
             </div>
           </div>
-          <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center">
-            <p className="text-gray-500">Production chart will be displayed here</p>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={productionData}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="time" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickMargin={10}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickMargin={10}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    padding: '0.75rem',
+                    fontSize: '0.875rem'
+                  }}
+                  formatter={(value, name) => [value, name === 'production' ? 'Actual' : 'Target']}
+                  labelFormatter={(label) => `Time: ${label}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="production"
+                  stroke="#3B82F6"
+                  strokeWidth={3}
+                  dot={false}
+                  activeDot={{ r: 6, stroke: '#2563EB', strokeWidth: 2, fill: '#FFFFFF' }}
+                  name="Production"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="target"
+                  stroke="#E5E7EB"
+                  strokeWidth={3}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  activeDot={{ r: 6, stroke: '#9CA3AF', strokeWidth: 2, fill: '#FFFFFF' }}
+                  name="Target"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="flex items-center justify-center mt-4 space-x-6">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                <span className="text-sm text-gray-600">Actual: {metricsData.currentHourProduction}</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-gray-200 mr-2"></div>
+                <span className="text-sm text-gray-600">Target: {metricsData.currentHourTarget}</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-gray-600">Efficiency: </span>
+                <span className={`font-medium ${metricsData.currentHourProduction >= metricsData.currentHourTarget ? 'text-green-600' : 'text-amber-600'}`}>
+                  {Math.round((metricsData.currentHourProduction / metricsData.currentHourTarget) * 100)}%
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
