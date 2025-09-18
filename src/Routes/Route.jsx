@@ -8,6 +8,7 @@ import Graphview from "../pages/GraphView/Graphview";
 import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
 import PlanActual from "../pages/Planactual/Planactual";
 import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
+import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
 
 function AppRoutes() {
   return (
@@ -60,6 +61,14 @@ function AppRoutes() {
           element={
             <Layout>
               <Equipmentefficencysummery/>
+            </Layout>
+          }
+        />
+        <Route
+          path="/machine-call-log"
+          element={
+            <Layout>
+              <MachineCallLog/>
             </Layout>
           }
         />
