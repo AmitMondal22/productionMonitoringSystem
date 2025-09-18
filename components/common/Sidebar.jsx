@@ -78,7 +78,7 @@ const Sidebar = () => {
                   )}
                 </div>
                 
-                
+
                 {!isCollapsed && item.count && (
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                     activeItem === item.label
@@ -118,31 +118,7 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Bottom Section */}
-      {!isCollapsed && (
-        <div className="absolute bottom-4 left-3 right-3">
-          <div className="bg-gradient-to-br from-white to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-sm">
-                <span className="text-white text-xs font-medium">JD</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-blue-800 truncate">John Doe</p>
-                <p className="text-xs text-blue-600 truncate">Administrator</p>
-              </div>
-            </div>
-            <div className="mt-2 pt-2 border-t border-blue-200">
-              <div className="flex justify-between text-xs">
-                <span className="text-blue-600">Storage</span>
-                <span className="text-blue-700 font-medium">2.4GB / 5GB</span>
-              </div>
-              <div className="mt-1 w-full bg-blue-200 rounded-full h-1">
-                <div className="bg-gradient-to-r from-blue-400 to-blue-500 h-1 rounded-full" style={{ width: '48%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
