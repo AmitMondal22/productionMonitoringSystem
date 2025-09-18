@@ -10,7 +10,9 @@ import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
 import PlanActual from "../pages/Planactual/Planactual";
 import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
 import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
-
+import MachinePlanTracker from "../pages/Machineplantracker/Machineplantracker";
+import LiveJobStatus from "../pages/LiveJobStatus/LiveJobStatus";
+import MachineStatusDashboard from "../pages/MachineStatusDashbord/MachineStatusDashboard";
 
 function AppRoutes() {
   return (
@@ -31,11 +33,11 @@ function AppRoutes() {
             </Layout>
           }
         />
-         <Route
+        <Route
           path="/planactual"
           element={
             <Layout>
-              <PlanActual/>
+              <PlanActual />
             </Layout>
           }
         />
@@ -44,25 +46,24 @@ function AppRoutes() {
           path="/graphview"
           element={
             <Layout>
-              <Graphview/>
+              <Graphview />
             </Layout>
           }
         />
-         <Route
+        <Route
           path="/hourlyassembly"
           element={
             <Layout>
-              <Hourlyassembly/>
+              <Hourlyassembly />
             </Layout>
           }
         />
 
-
-         <Route
+        <Route
           path="/equipmentefficencysummery"
           element={
             <Layout>
-              <Equipmentefficencysummery/>
+              <Equipmentefficencysummery />
             </Layout>
           }
         />
@@ -70,7 +71,40 @@ function AppRoutes() {
           path="/machine-call-log"
           element={
             <Layout>
-              <MachineCallLog/>
+              <MachineCallLog />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/machine-plan-tracker"
+          element={
+            <Layout>
+              <MachinePlanTracker />
+            </Layout>
+          }
+        />
+        <Route
+          path="/live-job-status"
+          element={
+            <Layout>
+              <LiveJobStatus />
+            </Layout>
+          }
+        />
+        <Route
+          path="/machine-status"
+          element={
+            <Layout>
+              <MachineStatusDashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/machine-dashboard"
+          element={
+            <Layout>
+              <MachineStatusDashboard />
             </Layout>
           }
         />
