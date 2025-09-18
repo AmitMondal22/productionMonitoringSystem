@@ -16,6 +16,7 @@ import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
 import MachinePlanTracker from "../pages/Machineplantracker/Machineplantracker";
 import LiveJobStatus from "../pages/LiveJobStatus/LiveJobStatus";
 import MachineStatusDashboard from "../pages/MachineStatusDashbord/MachineStatusDashboard";
+import MachineDashboard from "../pages/MachineDashboard/MachineDashboard";
 
 function AppRoutes() {
   return (
@@ -107,7 +108,7 @@ function AppRoutes() {
           path="/machine-dashboard"
           element={
             <Layout>
-              <MachineStatusDashboard />
+              <MachineDashboard/>
             </Layout>
           }
         />

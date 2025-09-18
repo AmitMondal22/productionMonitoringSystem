@@ -37,7 +37,7 @@ export default function Login() {
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
               <Gift className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-800">P&amp;G</span>
+            <span className="text-2xl font-bold text-gray-800">Production Monitoring System</span>
           </div>
 
           {/* Welcome Text */}
@@ -46,7 +46,7 @@ export default function Login() {
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 Welcome Back
               </span>{" "}
-              👋
+             
             </h2>
           </div>
 

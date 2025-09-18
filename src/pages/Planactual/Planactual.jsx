@@ -23,7 +23,7 @@ const PlanActual = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Plan vs Actual Report</h1>
+        <h3 className="text-3xl font-bold text-gray-800 mb-6">Plan vs Actual Report</h3>
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="flex-1">
@@ -52,10 +52,21 @@ const PlanActual = () => {
             </select>
           </div>
 
-          <div className="flex items-end gap-2">
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">Show</button>
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">Download</button>
-          </div>
+         <div className="flex items-end gap-2">
+  <button
+    onClick={() => console.log('Show clicked')}
+    className="bg-gradient-to-r from-indigo-400 to-indigo-400 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
+  >
+    Show
+  </button>
+  <button
+    onClick={() => console.log('Download clicked')}
+    className="bg-gradient-to-r from-indigo-400 to-indigo-400 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
+  >
+    Download
+  </button>
+</div>
+
         </div>
 
         <div className="bg-white rounded-lg shadow overflow-hidden">
