@@ -3,12 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login/Login";
 import Layout from "../../components/common/Layout";
+
 import Dashboard from "../pages/Dashboard";
 import Graphview from "../pages/GraphView/Graphview";
 import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
 import PlanActual from "../pages/Planactual/Planactual";
 import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
 import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
+
 
 function AppRoutes() {
   return (
