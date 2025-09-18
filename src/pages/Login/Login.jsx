@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Gift } from "lucide-react";
 import LoginImage from "../../assets/images/img2.svg";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -8,6 +9,8 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+const navigate= useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +19,9 @@ export default function Login() {
       setIsLoading(false);
       console.log({ email, password, rememberMe });
     }, 1500);
+    navigate('/dashboard')
   };
+
 
   return (
     <div className="min-h-screen flex">
