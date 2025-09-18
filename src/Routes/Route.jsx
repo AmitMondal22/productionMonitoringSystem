@@ -5,6 +5,9 @@ import Login from "../pages/Login/Login";
 import Layout from "../../components/common/Layout";
 import Dashboard from "../pages/Dashboard";
 import Graphview from "../pages/GraphView/Graphview";
+import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
+import PlanActual from "../pages/Planactual/Planactual";
+import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
 
 function AppRoutes() {
   return (
@@ -25,12 +28,38 @@ function AppRoutes() {
             </Layout>
           }
         />
+         <Route
+          path="/planactual"
+          element={
+            <Layout>
+              <PlanActual/>
+            </Layout>
+          }
+        />
 
         <Route
           path="/graphview"
           element={
             <Layout>
               <Graphview/>
+            </Layout>
+          }
+        />
+         <Route
+          path="/hourlyassembly"
+          element={
+            <Layout>
+              <Hourlyassembly/>
+            </Layout>
+          }
+        />
+
+
+         <Route
+          path="/equipmentefficencysummery"
+          element={
+            <Layout>
+              <Equipmentefficencysummery/>
             </Layout>
           }
         />
