@@ -1,98 +1,88 @@
 import React, { useState } from 'react';
 import { 
-  BellIcon, 
   UserCircleIcon, 
   Cog6ToothIcon,
-  MagnifyingGlassIcon,
-  ChevronDownIcon 
+  ChevronDownIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
-const Header = () => {
+const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-300 px-4 py-2 sticky top-0 z-40">
-      <div className="flex items-center justify-between">
-        {/* Left Side - Logo and Navigation */}
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-blue-600 rounded"></div>
-            <h1 className="text-lg font-bold text-black">Analytics Pro</h1>
-          </div>
-          
-          <nav className="hidden md:flex space-x-4">
-            <a href="#" className="text-blue-700 font-medium border-b-2 border-blue-600 pb-1 text-sm">
-              Dashboard
-            </a>
-            <a href="#" className="text-black hover:text-blue-700 transition-colors text-sm">
-              Analytics
-            </a>
-            <a href="#" className="text-black hover:text-blue-700 transition-colors text-sm">
-              Reports
-            </a>
-            <a href="#" className="text-black hover:text-blue-700 transition-colors text-sm">
-              Users
-            </a>
-          </nav>
-        </div>
-
-        {/* Center - Search */}
-        <div className="hidden lg:flex flex-1 max-w-xs mx-6">
-          <div className="relative w-full">
-            <MagnifyingGlassIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white"
-            />
-          </div>
-        </div>
+    <header className="bg-white shadow-sm border-b border-gray-200 px-3 py-2 sticky top-0 z-40">
+      <div className="flex items-center justify-between h-11">
         
-        {/* Right Side - Actions and Profile */}
-        <div className="flex items-center space-x-3">
-          {/* Notifications */}
-          <button className="relative p-1.5 text-black hover:text-blue-700 hover:bg-blue-50 rounded transition-colors">
-            <BellIcon className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">
-              3
-            </span>
+        {/* Left Side - Sidebar Toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+        >
+          {sidebarOpen ? (
+            <Bars3Icon className="h-5 w-5" />
+          ) : (
+            <Bars3Icon className="h-5 w-5" />
+          )}
+        </button>
+
+        {/* Right Side - Profile */}
+        <div className="relative">
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+          >
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
+              <span className="text-white text-xs font-semibold">JS</span>
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-xs font-semibold text-gray-900 leading-tight">John Smith</p>
+              <p className="text-[10px] text-gray-500 leading-tight">Production Manager</p>
+            </div>
+            <ChevronDownIcon 
+              className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
+                isProfileOpen ? 'rotate-180' : ''
+              }`} 
+            />
           </button>
 
-          {/* Settings */}
-          <button className="p-1.5 text-black hover:text-blue-700 hover:bg-blue-50 rounded transition-colors">
-            <Cog6ToothIcon className="h-4 w-4" />
-          </button>
-
-          {/* Profile Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center space-x-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
-            >
-              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-medium">JD</span>
+          {isProfileOpen && (
+            <>
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setIsProfileOpen(false)}
+              ></div>
+              <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="px-3 py-2 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-gray-900">John Smith</p>
+                  <p className="text-xs text-gray-500">john.smith@company.com</p>
+                  <p className="text-xs text-blue-600 font-medium">Production Manager</p>
+                </div>
+                <div className="py-1">
+                  <a href="#" className="flex items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                    <UserCircleIcon className="h-4 w-4 mr-2" />
+                    View Profile
+                  </a>
+                  <a href="#" className="flex items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                    <Cog6ToothIcon className="h-4 w-4 mr-2" />
+                    Account Settings
+                  </a>
+                  <a href="#" className="flex items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                    Help & Support
+                  </a>
+                </div>
+                <div className="border-t border-gray-100 pt-1">
+                  <a href="#" className="block px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                    Sign Out
+                  </a>
+                </div>
               </div>
-              <div className="hidden md:block text-left">
-                <p className="text-xs font-medium text-black">John Doe</p>
-                <p className="text-xs text-gray-600">Admin</p>
-              </div>
-              <ChevronDownIcon className="h-3 w-3 text-gray-400" />
-            </button>
-
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-1 w-40 bg-white rounded shadow-lg border border-gray-300 py-1 z-50">
-                <a href="#" className="block px-3 py-1.5 text-xs text-black hover:bg-blue-50">Profile</a>
-                <a href="#" className="block px-3 py-1.5 text-xs text-black hover:bg-blue-50">Settings</a>
-                <a href="#" className="block px-3 py-1.5 text-xs text-black hover:bg-blue-50">Help</a>
-                <hr className="my-1 border-gray-200" />
-                <a href="#" className="block px-3 py-1.5 text-xs text-black hover:bg-blue-50">Sign out</a>
-              </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </header>
   );
 };
 
-export default Header
+export default Header;
