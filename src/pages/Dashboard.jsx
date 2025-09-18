@@ -1,16 +1,16 @@
-import React from 'react';
-import MetricCard from '../components/dashboard/MetricCard';
-import LineChart from '../components/dashboard/LineChart';
-import DonutChart from '../components/dashboard/DonutChart';
-import GaugeChart from '../components/dashboard/GaugeChart';
-import DataTable from '../components/dashboard/DataTable';
+import React from "react";
+import MetricCard from "../../components/dashboard/MetricCard";
+import LineChart from "../../components/dashboard/LineChart";
+import DonutChart from "../../components/dashboard/DonutChart";
+import GaugeChart from "../../components/dashboard/GaugeChart";
+import DataTable from "../../components/dashboard/DataTable";
 
 const Dashboard = () => {
   const metrics = [
-    { title: 'Total Revenue', value: '$45,231', change: '+20.1%', trend: 'up' },
-    { title: 'Active Users', value: '2,341', change: '+180.1%', trend: 'up' },
-    { title: 'Orders', value: '1,156', change: '-19%', trend: 'down' },
-    { title: 'Conversion', value: '89.2%', change: '+12%', trend: 'up' },
+    { title: "Total Revenue", value: "$45,231", change: "+20.1%", trend: "up" },
+    { title: "Active Users", value: "2,341", change: "+180.1%", trend: "up" },
+    { title: "Orders", value: "1,156", change: "-19%", trend: "down" },
+    { title: "Conversion", value: "89.2%", change: "+12%", trend: "up" },
   ];
 
   return (
