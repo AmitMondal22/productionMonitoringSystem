@@ -1,33 +1,139 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   UserCircleIcon, 
   Cog6ToothIcon,
   ChevronDownIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ArrowsPointingOutIcon,
+  ArrowsPointingInIcon
 } from '@heroicons/react/24/outline';
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [sidebarStateBeforeFullscreen, setSidebarStateBeforeFullscreen] = useState(null);
+  const isEventListenerConnected = useRef(false);
+
+  // Check if currently in fullscreen
+  const getFullScreenElement = () => {
+    return document.fullscreenElement || 
+           document.webkitFullscreenElement || 
+           document.mozFullScreenElement || 
+           document.msFullscreenElement;
+  };
+
+  // Get fullscreen change event name for cross-browser compatibility
+  const getFullScreenChangeEvent = () => {
+    if (document.fullscreenEnabled) return 'fullscreenchange';
+    if (document.webkitFullscreenEnabled) return 'webkitfullscreenchange';
+    if (document.mozFullScreenEnabled) return 'mozfullscreenchange';
+    if (document.msFullscreenEnabled) return 'msfullscreenchange';
+    return null;
+  };
+
+  // Handle fullscreen change events
+  const fullScreenChangeListener = () => {
+    const isFullScreenActive = getFullScreenElement() != null;
+    setIsFullscreen(isFullScreenActive);
+    
+    if (isFullScreenActive) {
+      // Going fullscreen - save current sidebar state and hide it
+      setSidebarStateBeforeFullscreen(sidebarOpen);
+      setSidebarOpen(false);
+    } else {
+      // Exiting fullscreen - restore previous sidebar state
+      if (sidebarStateBeforeFullscreen !== null) {
+        setSidebarOpen(sidebarStateBeforeFullscreen);
+        setSidebarStateBeforeFullscreen(null);
+      }
+    }
+  };
+
+  // Setup fullscreen event listener
+  useEffect(() => {
+    if (!isEventListenerConnected.current) {
+      const eventName = getFullScreenChangeEvent();
+      if (eventName) {
+        document.addEventListener(eventName, fullScreenChangeListener);
+        isEventListenerConnected.current = true;
+      }
+    }
+
+    // Cleanup
+    return () => {
+      const eventName = getFullScreenChangeEvent();
+      if (eventName && isEventListenerConnected.current) {
+        document.removeEventListener(eventName, fullScreenChangeListener);
+        isEventListenerConnected.current = false;
+      }
+    };
+  }, [sidebarOpen]);
+
+  // Toggle fullscreen mode
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    } else {
+      // Enter fullscreen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-3 py-2 sticky top-0 z-40">
       <div className="flex items-center justify-between h-11">
-        
-        {/* Left Side - Sidebar Toggle */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          {sidebarOpen ? (
-            <Bars3Icon className="h-5 w-5" />
-          ) : (
-            <Bars3Icon className="h-5 w-5" />
+        {/* Left Side - Sidebar Toggle & Fullscreen */}
+        <div className="flex items-center space-x-1">
+          {/* Sidebar Toggle - Hide in fullscreen */}
+          {!isFullscreen && (
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+              title={sidebarOpen ? "Close Sidebar" : "Open Sidebar"}
+            >
+              {sidebarOpen ? (
+                <Bars3Icon className="h-5 w-5" />
+              ) : (
+                <Bars3Icon className="h-5 w-5" />
+              )}
+            </button>
           )}
-        </button>
+         
+        </div>
 
         {/* Right Side - Profile */}
-        <div className="relative">
+        <div className="flex items-center space-x-1">
+         {/* Fullscreen Toggle */}
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? (
+              <ArrowsPointingInIcon className="h-5 w-5" />
+            ) : (
+              <ArrowsPointingOutIcon className="h-5 w-5" />
+            )}
+          </button>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-blue-50 transition-colors"
