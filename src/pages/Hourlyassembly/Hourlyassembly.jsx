@@ -1,4 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Download, 
+  Filter, 
+  Calendar, 
+  Clock, 
+  Sun, 
+  Moon, 
+  BarChart2, 
+  Activity, 
+  Clock3, 
+  Clock9, 
+  Clock12,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
 
 
 const sampleData = [
@@ -22,10 +43,41 @@ const sampleData = [
 
 function Hourlyassembly() {
   const [selectedMonth, setSelectedMonth] = useState('MAY');
-  const [selectedYear, setSelectedYear] = useState('2019');
+  const [selectedYear, setSelectedYear] = useState('2023');
+  const [activeTab, setActiveTab] = useState('day1');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  const years = ['2018', '2019', '2020', '2021', '2022'];
+  const years = ['2021', '2022', '2023', '2024'];
+  const tabs = [
+    { id: 'day1', label: 'Day 1', color: 'blue' },
+    { id: 'day2', label: 'Day 2', color: 'green' },
+    { id: 'day3', label: 'Day 3', color: 'purple' },
+  ];
+
+  // Calculate summary metrics
+  const summaryStats = useMemo(() => {
+    const day1Data = sampleData.filter(row => row.shift === 'DAY');
+    const nightData = sampleData.filter(row => row.shift === 'NIGHT');
+    
+    const day1Total = day1Data.reduce((sum, row) => {
+      return sum + (row.line1day1 || 0) + (row.line2day1 || 0) + (row.line3day1 || 0);
+    }, 0);
+    
+    const nightTotal = nightData.reduce((sum, row) => {
+      return sum + (row.line1day1 || 0) + (row.line2day1 || 0) + (row.line3day1 || 0);
+    }, 0);
+    
+    const total = day1Total + nightTotal;
+    const avgPerHour = total / sampleData.length;
+    
+    return {
+      day1Total,
+      nightTotal,
+      total,
+      avgPerHour: Math.round(avgPerHour * 100) / 100
+    };
+  }, []);
 
   const handleShow = () => {
     console.log('Show clicked with:', { selectedMonth, selectedYear });
@@ -34,104 +86,374 @@ function Hourlyassembly() {
   const handleDownload = () => {
     console.log('Download clicked');
   };
+  
+  const getShiftIcon = (shift) => {
+    return shift === 'DAY' ? 
+      <Sun className="w-4 h-4 text-amber-500" /> : 
+      <Moon className="w-4 h-4 text-indigo-500" />;
+  };
+  
+  const getCellValue = (row, column) => {
+    const cellValue = row[column];
+    if (cellValue === '' || cellValue === undefined) return '';
+    
+    // Add color coding based on value
+    let bgColor = '';
+    if (cellValue >= 80) bgColor = 'bg-green-50 text-green-700';
+    else if (cellValue >= 50) bgColor = 'bg-blue-50 text-blue-700';
+    else if (cellValue > 0) bgColor = 'bg-amber-50 text-amber-700';
+    
+    return (
+      <div className={`px-2 py-1 rounded-md text-center font-medium ${bgColor}`}>
+        {cellValue}
+      </div>
+    );
+  };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <h2 className="text-xl font-semibold text-gray-700 mb-6">HOURLY ASSEMBLY</h2>
-        
-        {/* Controls */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-1">MONTH</label>
-            <select 
-              value={selectedMonth} 
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-500 min-w-24"
-            >
-              {months.map(month => (
-                <option key={month} value={month}>{month}</option>
-              ))}
-            </select>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm mb-6 overflow-hidden">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+                  <Clock3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-800">Hourly Assembly</h2>
+                  <p className="text-gray-500 text-sm">Track and analyze production performance by hour</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Day Shift Total</p>
+                <p className="text-2xl font-bold text-blue-600">{summaryStats.day1Total.toLocaleString()}</p>
+              </div>
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+                <Sun className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" 
+                style={{ width: '75%' }}
+              ></div>
+            </div>
           </div>
           
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-1">YEAR</label>
-            <select 
-              value={selectedYear} 
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-500 min-w-24"
-            >
-              {years.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Night Shift Total</p>
+                <p className="text-2xl font-bold text-indigo-600">{summaryStats.nightTotal.toLocaleString()}</p>
+              </div>
+              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                <Moon className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-purple-500" 
+                style={{ width: '45%' }}
+              ></div>
+            </div>
           </div>
-         <div className="flex gap-2 ml-auto mt-2">
-  <button
-    onClick={handleShow}
-    className="bg-gradient-to-r from-blue-500 to-indigo-400 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
-  >
-    SHOW
-  </button>
-  <button
-    onClick={handleDownload}
-    className="bg-gradient-to-r from-blue-500 to-indigo-400 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300"
-  >
-    DOWNLOAD
-  </button>
-</div>
+          
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Production</p>
+                <p className="text-2xl font-bold text-green-600">{summaryStats.total.toLocaleString()}</p>
+              </div>
+              <div className="p-2 rounded-lg bg-green-50 text-green-600">
+                <Activity className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-green-400 to-emerald-500" 
+                style={{ width: '85%' }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Avg. Per Hour</p>
+                <p className="text-2xl font-bold text-purple-600">{summaryStats.avgPerHour.toLocaleString()}</p>
+              </div>
+              <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+                <Clock className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-500" 
+                style={{ width: '65%' }}
+              ></div>
+            </div>
+          </div>
+        </div>
 
+        {/* Controls */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
+          <div className="flex flex-wrap items-end gap-4">
+            {/* Day Tabs */}
+            <div className="w-full md:w-auto">
+              <div className="flex space-x-1 p-1 bg-gray-50 rounded-lg">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-white shadow-sm text-gray-900'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Month Selector */}
+            <div className="flex-1 min-w-[150px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+              <div className="relative">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all appearance-none"
+                >
+                  {months.map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <ArrowDown className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Year Selector */}
+            <div className="flex-1 min-w-[120px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+              <div className="relative">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all appearance-none"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <ArrowDown className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search hours..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all"
+                />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <button
+                onClick={handleShow}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Apply Filters
+              </button>
+              <button
+                onClick={handleDownload}
+                className="px-4 py-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg shadow-sm transition-colors flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-green-200">
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">S.NO.</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">FROM</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">TO</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">SHIFT</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">MTD TGT</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">MTD HOURLY</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">MTD AVG</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line1/Day1</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line2/Day1</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line3/Day1</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line1/Day2</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line2/Day2</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line3/Day2</th>
-                <th className="border border-gray-400 px-2 py-2 text-xs font-semibold text-gray-700 text-center">Line1/Day3</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sampleData.map((row) => (
-                <tr key={row.sno} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.sno}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.from}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.to}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.shift}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.mtdtgt}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.mtdhourly}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.mtdavg}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line1day1}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line2day1}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line3day1}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line1day2}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line2day2}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line3day2}</td>
-                  <td className="border border-gray-300 px-2 py-2 text-xs text-center">{row.line1day3}</td>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center">
+                      <span>Time</span>
+                      <button className="ml-1 text-gray-400 hover:text-gray-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                      </button>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center">
+                      <span>Shift</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center justify-center">
+                      <span>Line 1</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center justify-center">
+                      <span>Line 2</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center justify-center">
+                      <span>Line 3</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center justify-center">
+                      <span>Hourly Avg</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center justify-center">
+                      <span>Status</span>
+                    </div>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {sampleData.map((row) => {
+                  // Calculate hourly average for the row
+                  const line1 = row.line1day1 || 0;
+                  const line2 = row.line2day1 || 0;
+                  const line3 = row.line3day1 || 0;
+                  const total = line1 + line2 + line3;
+                  const avg = Math.round((total / 3) * 100) / 100;
+                  
+                  // Determine status
+                  let status = 'idle';
+                  let statusColor = 'bg-gray-100 text-gray-800';
+                  if (total > 150) {
+                    status = 'high';
+                    statusColor = 'bg-green-100 text-green-800';
+                  } else if (total > 50) {
+                    status = 'medium';
+                    statusColor = 'bg-blue-100 text-blue-800';
+                  } else if (total > 0) {
+                    status = 'low';
+                    statusColor = 'bg-amber-100 text-amber-800';
+                  }
+                  
+                  return (
+                    <tr key={row.sno} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                            <Clock12 className="w-4 h-4" />
+                          </div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">{row.from} - {row.to}</div>
+                            <div className="text-xs text-gray-500">{row.sno} hour{row.sno !== 1 ? 's' : ''} in</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {getShiftIcon(row.shift)}
+                          <span className="ml-2 text-sm font-medium text-gray-900">{row.shift}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        {getCellValue(row, 'line1day1')}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        {getCellValue(row, 'line2day1')}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        {getCellValue(row, 'line3day1')}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                          {isNaN(avg) ? '-' : avg}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColor}`}>
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot className="bg-gray-50">
+                <tr>
+                  <td colSpan="7" className="px-4 py-3 text-right text-xs text-gray-500">
+                    Showing hourly data for {selectedMonth} {selectedYear} • {sampleData.length} hours
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
-        {/* Pagination or additional controls could go here */}
-        <div className="mt-4 text-sm text-gray-500 text-center">
-          Showing hourly assembly data for {selectedMonth} {selectedYear}
+        {/* Time Legend */}
+        <div className="mt-4 flex items-center justify-center space-x-4 text-xs text-gray-500">
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-green-100 border border-green-300 mr-1"></div>
+            <span>High Production</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-300 mr-1"></div>
+            <span>Medium Production</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-300 mr-1"></div>
+            <span>Low Production</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-gray-100 border border-gray-300 mr-1"></div>
+            <span>Idle</span>
+          </div>
         </div>
       </div>
     </div>
