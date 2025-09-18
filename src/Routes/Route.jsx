@@ -4,12 +4,15 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login/Login";
 import Layout from "../../components/common/Layout";
 
-import Dashboard from "../pages/Dashboard";
+
+import Dashboard from "../pages/Dashboard/Dashboard";
+
 import Graphview from "../pages/GraphView/Graphview";
 import Hourlyassembly from "../pages/Hourlyassembly/Hourlyassembly";
 import PlanActual from "../pages/Planactual/Planactual";
 import Equipmentefficencysummery from "../pages/Equipmentefficencysummery/Equipmentefficencysummery";
 import MachineCallLog from "../pages/Machinecalllog/MachineCallLog";
+
 import MachinePlanTracker from "../pages/Machineplantracker/Machineplantracker";
 import LiveJobStatus from "../pages/LiveJobStatus/LiveJobStatus";
 import MachineStatusDashboard from "../pages/MachineStatusDashbord/MachineStatusDashboard";
